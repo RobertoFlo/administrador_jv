@@ -28,6 +28,8 @@ class DatabaseSeeder extends Seeder
         $user->assignRole('administrador');
         $this->call([
             carga::class,
+            seeder_catalogos::class,
         ]);
+
     }
 }
