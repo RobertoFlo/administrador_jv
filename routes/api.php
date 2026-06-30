@@ -48,6 +48,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('compra-detalles', CompraDetalleController::class)->only(['index', 'show', 'destroy']);
 
     Route::prefix('reportes')->group(function () {
+        Route::get('dashboard-stats', [ReporteController::class, 'dashboardStats']);
         Route::get('ventas', [ReporteController::class, 'ventas']);
         Route::get('caja', [ReporteController::class, 'caja']);
         Route::get('ventas-por-empleado', [ReporteController::class, 'ventasPorEmpleado']);

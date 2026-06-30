@@ -28,7 +28,7 @@ class AuthController extends Controller
             ], 429);
         }
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (!Auth::guard('web')->attempt($request->only('email', 'password'))) {
             RateLimiter::hit($throttleKey, 60); // Bloquea por 60 segundos
             
             LoginAttempt::create([

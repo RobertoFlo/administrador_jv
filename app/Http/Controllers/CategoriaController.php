@@ -4,12 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CategoriaRequest;
 use App\Models\Categoria;
+use Illuminate\Http\Request;
 
 class CategoriaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Categoria::with('subcategorias')->get());
+        $categorias = Categoria::with('subcategorias')
+            ->when($request->search, function ($query) use ($request) {
+                $query->where('nombre', 'ILIKE', "%{$request->search}%");
+            })
+            ->orderBy('id', 'desc')
+            ->get();
+        return response()->json($categorias);
     }
 
     public function store(CategoriaRequest $request)

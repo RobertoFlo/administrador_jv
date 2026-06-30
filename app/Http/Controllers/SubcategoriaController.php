@@ -4,11 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SubcategoriaRequest;
 use App\Models\Subcategoria;
-
+use Illuminate\Http\Request;
 class SubcategoriaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search', '');
+        if ($search) {
+            return response()->json(Subcategoria::where('nombre', 'ILIKE', "%{$search}%")->with('categoria')->get());
+        }
+
         return response()->json(Subcategoria::with('categoria')->get());
     }
 
