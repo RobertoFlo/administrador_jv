@@ -9,7 +9,7 @@ class VentaDetalle extends Model
     protected $table = 'venta_detalles_mnt';
     protected $fillable = [
         'venta_id', 'producto_id', 'cantidad',
-        'precio_compra', 'precio_venta', 'comision_unitaria', 'subtotal',
+        'precio_compra', 'precio_venta', 'subtotal',
     ];
 
     public function venta()

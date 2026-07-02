@@ -13,7 +13,19 @@ class CompraController extends Controller
 {
     public function index()
     {
-        return response()->json(Compra::with('detalles.producto')->get());
+        $search = request('search');
+        $fecha = request('fecha');
+        $query = Compra::with('detalles.producto');
+
+        if ($search) {
+            $query->where('numero_compra', 'ILIKE', "%{$search}%");
+        }
+
+        if ($fecha) {
+            $query->whereDate('created_at', $fecha);
+        }
+
+        return response()->json($query->orderBy('created_at', 'desc')->get());
     }
 
     public function store(CompraRequest $request)
@@ -28,6 +40,7 @@ class CompraController extends Controller
 
             foreach ($data['detalles'] as $detalle) {
                 $producto = Producto::findOrFail($detalle['producto_id']);
+                $stockAnterior = $producto->stock;
 
                 CompraDetalle::create([
                     'compra_id' => $compra->id,
@@ -37,13 +50,18 @@ class CompraController extends Controller
                     'subtotal' => $detalle['subtotal'],
                 ]);
 
-                $producto->increment('stock', $detalle['cantidad']);
+                $producto->precio_compra = $detalle['costo_unitario'];
+                if (isset($detalle['precio_venta']) && !is_null($detalle['precio_venta'])) {
+                    $producto->precio_venta = $detalle['precio_venta'];
+                }
+                $producto->stock += $detalle['cantidad'];
+                $producto->save();
 
                 InventarioMovimiento::create([
                     'producto_id' => $detalle['producto_id'],
                     'tipo_movimiento_inventario_id' => 1,
                     'cantidad' => $detalle['cantidad'],
-                    'stock_anterior' => $producto->stock - $detalle['cantidad'],
+                    'stock_anterior' => $stockAnterior,
                     'stock_actual' => $producto->stock,
                     'observacion' => "Compra #{$compra->numero_compra}",
                 ]);

@@ -58,8 +58,8 @@ return new class extends Migration
         Schema::create('categorias_mnt', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->boolean('activo')->default(true);
             $table->timestamps();
+            $table->softDeletes(); // Añade la columna 'deleted_at'
         });
 
         Schema::create('subcategorias_mnt', function (Blueprint $table) {
@@ -70,9 +70,9 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->string('nombre');
-            $table->boolean('activo')->default(true);
 
             $table->timestamps();
+            $table->softDeletes(); // Añade la columna 'deleted_at'
         });
 
         /*
@@ -101,15 +101,14 @@ return new class extends Migration
             $table->decimal('precio_compra', 12, 2)->default(0);
             $table->decimal('precio_venta', 12, 2)->default(0);
 
-            // Si la empresa te paga comisión por unidad
-            $table->decimal('comision_por_unidad', 12, 2)->default(0);
-
             // Stock actual (consulta rápida)
             $table->integer('stock')->default(0);
 
             $table->integer('stock_minimo')->default(0);
 
             $table->timestamps();
+            $table->softDeletes();
+
         });
 
         /*
@@ -136,6 +135,7 @@ return new class extends Migration
             $table->text('observacion')->nullable();
 
             $table->timestamps();
+            
         });
 
         /*
@@ -207,9 +207,6 @@ return new class extends Migration
 
             $table->decimal('total', 12, 2)->default(0);
 
-            // Total de comisiones generadas en la venta
-            $table->decimal('comision_total', 12, 2)->default(0);
-
             $table->timestamps();
         });
 
@@ -234,8 +231,6 @@ return new class extends Migration
             $table->decimal('precio_compra', 12, 2);
 
             $table->decimal('precio_venta', 12, 2);
-
-            $table->decimal('comision_unitaria', 12, 2);
 
             $table->decimal('subtotal', 12, 2);
 
@@ -319,10 +314,10 @@ return new class extends Migration
         Schema::dropIfExists('productos_mnt');
 
         Schema::dropIfExists('empleados_mnt');
-
+        
         Schema::dropIfExists('subcategorias_mnt');
         Schema::dropIfExists('categorias_mnt');
-
+        
         Schema::dropIfExists('metodos_pago_ctl');
         Schema::dropIfExists('estado_movimiento_caja_ctl');
         Schema::dropIfExists('estado_caja_ctl');

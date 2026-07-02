@@ -35,8 +35,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('estados-caja', EstadoCajaController::class);
     Route::apiResource('estados-movimiento-caja', EstadoMovimientoCajaController::class);
     Route::apiResource('metodos-pago', MetodoPagoController::class);
-    Route::apiResource('categorias', CategoriaController::class);
-    Route::apiResource('subcategorias', SubcategoriaController::class);
+    Route::apiResource('categorias', CategoriaController::class)->withTrashed(['show', 'update', 'destroy']);
+    Route::get('categorias/{categoria}/subcategoria', [CategoriaController::class, 'subcategorias'])->withTrashed();
+    Route::apiResource('subcategorias', SubcategoriaController::class)->withTrashed(['show', 'update', 'destroy']);
     Route::apiResource('empleados', EmpleadoController::class);
     Route::apiResource('productos', ProductoController::class);
     Route::apiResource('inventario-movimientos', InventarioMovimientoController::class)->except(['update']);

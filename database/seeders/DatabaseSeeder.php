@@ -15,6 +15,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // 1. Ejecutar los seeders de catálogos y datos primero
+        // para asegurar que todas las tablas base estén creadas.
+        $this->call([
+            seeder_catalogos::class,
+            carga::class,
+        ]);
         // User::factory(10)->create();
         $adminRole = Role::firstOrCreate([
             'name' => 'administrador',
@@ -26,10 +32,5 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('admin123')
         ]);
         $user->assignRole('administrador');
-        $this->call([
-            carga::class,
-            seeder_catalogos::class,
-        ]);
-
     }
 }

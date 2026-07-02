@@ -9,7 +9,7 @@ class Venta extends Model
     protected $table = 'ventas_mnt';
     protected $fillable = [
         'numero_factura', 'codigo_empleado', 'metodo_pago_id',
-        'subtotal', 'total', 'comision_total',
+        'subtotal', 'total',
     ];
 
     public function metodoPago()

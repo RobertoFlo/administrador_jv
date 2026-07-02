@@ -10,11 +10,13 @@ class CategoriaController extends Controller
 {
     public function index(Request $request)
     {
+
         $categorias = Categoria::with('subcategorias')
             ->when($request->search, function ($query) use ($request) {
                 $query->where('nombre', 'ILIKE', "%{$request->search}%");
             })
             ->orderBy('id', 'desc')
+            ->withTrashed()
             ->get();
         return response()->json($categorias);
     }
@@ -26,7 +28,9 @@ class CategoriaController extends Controller
 
     public function show(Categoria $categoria)
     {
-        return response()->json($categoria->load('subcategorias'));
+        return response()->json($categoria->load(['subcategorias' => function ($query) {
+            $query->withTrashed();
+        }]));
     }
 
     public function update(CategoriaRequest $request, Categoria $categoria)
@@ -37,7 +41,19 @@ class CategoriaController extends Controller
 
     public function destroy(Categoria $categoria)
     {
+
+        if ($categoria->trashed()) {
+            $categoria->restore();
+            $categoria->subcategorias()->onlyTrashed()->restore();
+            return response()->json(['message' => 'Categoría restaurada exitosamente.'], 200);
+        }
+        $categoria->subcategorias()->delete();
         $categoria->delete();
-        return response()->json(null, 204);
+        return response()->json(['message' => 'Categoría movida a la papelera.'], 200);
+    }
+
+    public function subcategorias(Categoria $categoria)
+    {
+        return response()->json($categoria->subcategorias()->withTrashed()->get());
     }
 }

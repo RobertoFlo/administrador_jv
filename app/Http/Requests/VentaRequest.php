@@ -15,13 +15,11 @@ class VentaRequest extends FormRequest
             'metodo_pago_id' => 'required|exists:metodos_pago_ctl,id',
             'subtotal' => 'required|numeric|min:0',
             'total' => 'required|numeric|min:0',
-            'comision_total' => 'nullable|numeric|min:0',
             'detalles' => 'required|array|min:1',
             'detalles.*.producto_id' => 'required|exists:productos_mnt,id',
             'detalles.*.cantidad' => 'required|integer|min:1',
             'detalles.*.precio_compra' => 'required|numeric|min:0',
             'detalles.*.precio_venta' => 'required|numeric|min:0',
-            'detalles.*.comision_unitaria' => 'required|numeric|min:0',
             'detalles.*.subtotal' => 'required|numeric|min:0',
         ];
     }

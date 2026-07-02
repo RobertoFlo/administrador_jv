@@ -9,7 +9,19 @@ class EmpleadoController extends Controller
 {
     public function index()
     {
-        return response()->json(Empleado::all());
+        $search = request('search');
+        $query = Empleado::query();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nombre', 'ILIKE', "%{$search}%")
+                    ->orWhere('apellidos', 'ILIKE', "%{$search}%")
+                    ->orWhere('dui', 'ILIKE', "%{$search}%")
+                    ->orWhere('codigo', 'ILIKE', "%{$search}%");
+            });
+        }
+
+        return response()->json($query->get());
     }
 
     public function store(EmpleadoRequest $request)

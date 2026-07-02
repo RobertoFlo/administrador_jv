@@ -6,13 +6,32 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class CategoriaRequest extends FormRequest
 {
-    public function authorize(): bool { return true; }
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true; 
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
     public function rules(): array
     {
-        $id = $this->route('categoria');
-        return [
-            'nombre' => 'required|string|max:255' . ($id ? ",$id" : ''),
-            'activo' => 'boolean',
+        $rules = [
+            'nombre' => 'required|string|max:255',
         ];
+
+        if ($this->route('categoria')) {
+            $categoriaId = $this->route('categoria')->id;
+            $rules['nombre'] .= '|unique:categorias_mnt,nombre,' . $categoriaId;
+        } else {
+            $rules['nombre'] .= '|unique:categorias_mnt,nombre';
+        }
+
+        return $rules;
     }
 }

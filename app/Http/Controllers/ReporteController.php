@@ -38,7 +38,7 @@ class ReporteController extends Controller
                 'venta_detalles_mnt.producto_id',
                 DB::raw('SUM(venta_detalles_mnt.cantidad) as total_unidades'),
                 DB::raw('SUM(venta_detalles_mnt.subtotal) as total_vendido'),
-                DB::raw('SUM((venta_detalles_mnt.precio_venta - venta_detalles_mnt.precio_compra - venta_detalles_mnt.comision_unitaria) * venta_detalles_mnt.cantidad) as ganancia_real')
+                DB::raw('SUM((venta_detalles_mnt.precio_venta - venta_detalles_mnt.precio_compra) * venta_detalles_mnt.cantidad) as ganancia_real')
             )
             ->groupBy('venta_detalles_mnt.producto_id')
             ->get();
@@ -92,7 +92,6 @@ class ReporteController extends Controller
             'codigo_empleado',
             DB::raw('COUNT(*) as total_ventas'),
             DB::raw('SUM(total) as monto_total'),
-            DB::raw('SUM(comision_total) as comision_total'),
         )
             ->whereDate('created_at', '>=', $request->fecha_inicio)
             ->whereDate('created_at', '<=', $request->fecha_fin)
@@ -118,7 +117,7 @@ class ReporteController extends Controller
                 'productos_mnt.codigo',
                 DB::raw('SUM(venta_detalles_mnt.cantidad) as total_unidades'),
                 DB::raw('SUM(venta_detalles_mnt.subtotal) as total_vendido'),
-                DB::raw('SUM((venta_detalles_mnt.precio_venta - venta_detalles_mnt.precio_compra - venta_detalles_mnt.comision_unitaria) * venta_detalles_mnt.cantidad) as ganancia_real')
+                DB::raw('SUM((venta_detalles_mnt.precio_venta - venta_detalles_mnt.precio_compra) * venta_detalles_mnt.cantidad) as ganancia_real')
             );
 
         if ($request->fecha_inicio) {

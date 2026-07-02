@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\VentaRequest;
+use App\Models\Caja;
+use App\Models\CajaMovimiento;
 use App\Models\InventarioMovimiento;
 use App\Models\Producto;
 use App\Models\Venta;
@@ -23,13 +25,12 @@ class VentaController extends Controller
             $venta = Venta::create([
                 'numero_factura' => $data['numero_factura'],
                 'codigo_empleado' => $data['codigo_empleado'],
+                'referencia_pago' => $data['referencia_pago'] ?? null, // Guardamos la referencia
                 'metodo_pago_id' => $data['metodo_pago_id'],
                 'subtotal' => $data['subtotal'],
                 'total' => $data['total'],
-                'comision_total' => $data['comision_total'],
             ]);
 
-            $comisionTotal = 0;
             foreach ($data['detalles'] as $detalle) {
                 $producto = Producto::findOrFail($detalle['producto_id']);
 
@@ -39,7 +40,6 @@ class VentaController extends Controller
                     'cantidad' => $detalle['cantidad'],
                     'precio_compra' => $detalle['precio_compra'],
                     'precio_venta' => $detalle['precio_venta'],
-                    'comision_unitaria' => $detalle['comision_unitaria'],
                     'subtotal' => $detalle['subtotal'],
                 ]);
 
@@ -53,11 +53,24 @@ class VentaController extends Controller
                     'stock_actual' => $producto->stock,
                     'observacion' => "Venta #{$venta->numero_factura}",
                 ]);
-
-                $comisionTotal += $detalle['comision_unitaria'] * $detalle['cantidad'];
             }
 
-            $venta->update(['comision_total' => $comisionTotal]);
+            // --- LÓGICA DE CAJA ---
+            // ID 1 = EFECTIVO según tu seeder (seeder_catalogos.php)
+            if ($data['metodo_pago_id'] == 1) {
+                // Buscamos la caja que esté abierta hoy
+                $cajaAbierta = Caja::where('estado_caja_id', 1)->firstOrFail(); // 1 = ABIERTA
+
+                CajaMovimiento::create([
+                    'caja_id' => $cajaAbierta->id,
+                    'estado_movimiento_caja_id' => 2, // 2 = INGRESO
+                    'monto' => $venta->total,
+                    'referencia' => "Venta #{$venta->numero_factura}",
+                    'descripcion' => 'Ingreso por venta en efectivo',
+                ]);
+                // Actualizamos el saldo rápido de la caja
+                $cajaAbierta->increment('saldo_actual', $venta->total);
+            }
 
             return response()->json($venta->load('detalles.producto'), 201);
         });

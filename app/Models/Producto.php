@@ -10,7 +10,7 @@ class Producto extends Model
     protected $fillable = [
         'categoria_id', 'subcategoria_id', 'estado_producto_id',
         'codigo', 'nombre', 'descripcion',
-        'precio_compra', 'precio_venta', 'comision_por_unidad',
+        'precio_compra', 'precio_venta',
         'stock', 'stock_minimo',
     ];
 

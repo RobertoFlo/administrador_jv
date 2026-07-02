@@ -18,6 +18,7 @@ class CompraRequest extends FormRequest
             'detalles.*.cantidad' => 'required|integer|min:1',
             'detalles.*.costo_unitario' => 'required|numeric|min:0',
             'detalles.*.subtotal' => 'required|numeric|min:0',
+            'detalles.*.precio_venta' => 'nullable|numeric|min:0',
         ];
     }
 }
