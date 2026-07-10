@@ -43,16 +43,18 @@ class VentaController extends Controller
                     'subtotal' => $detalle['subtotal'],
                 ]);
 
-                $producto->decrement('stock', $detalle['cantidad']);
+                if ($producto->producto_fisico !== false) {
+                    $producto->decrement('stock', $detalle['cantidad']);
 
-                InventarioMovimiento::create([
-                    'producto_id' => $detalle['producto_id'],
-                    'tipo_movimiento_inventario_id' => 2,
-                    'cantidad' => -$detalle['cantidad'],
-                    'stock_anterior' => $producto->stock + $detalle['cantidad'],
-                    'stock_actual' => $producto->stock,
-                    'observacion' => "Venta #{$venta->numero_factura}",
-                ]);
+                    InventarioMovimiento::create([
+                        'producto_id' => $detalle['producto_id'],
+                        'tipo_movimiento_inventario_id' => 2,
+                        'cantidad' => -$detalle['cantidad'],
+                        'stock_anterior' => $producto->stock + $detalle['cantidad'],
+                        'stock_actual' => $producto->stock,
+                        'observacion' => "Venta #{$venta->numero_factura}",
+                    ]);
+                }
             }
 
             // --- LÓGICA DE CAJA ---

@@ -9,9 +9,14 @@ class Producto extends Model
     protected $table = 'productos_mnt';
     protected $fillable = [
         'categoria_id', 'subcategoria_id', 'estado_producto_id',
+        'producto_fisico',
         'codigo', 'nombre', 'descripcion',
         'precio_compra', 'precio_venta',
         'stock', 'stock_minimo',
+    ];
+
+    protected $casts = [
+        'producto_fisico' => 'boolean',
     ];
 
     public function categoria()

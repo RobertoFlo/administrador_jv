@@ -24,9 +24,29 @@ class ProductoController extends Controller
         return response()->json($productos);
     }
 
+    private function procesarDatosProducto(array $data): array
+    {
+        $esFisico = !isset($data['producto_fisico']) || filter_var($data['producto_fisico'], FILTER_VALIDATE_BOOLEAN);
+
+        if (!$esFisico) {
+            $data['producto_fisico'] = false;
+            $data['precio_compra'] = 0;
+            $data['stock'] = 0;
+            $data['stock_minimo'] = 0;
+        } else {
+            $data['producto_fisico'] = true;
+            $data['precio_compra'] = $data['precio_compra'] ?? 0;
+            $data['stock'] = $data['stock'] ?? 0;
+            $data['stock_minimo'] = $data['stock_minimo'] ?? 0;
+        }
+
+        return $data;
+    }
+
     public function store(ProductoRequest $request)
     {
-        return response()->json(Producto::create($request->validated()), 201);
+        $data = $this->procesarDatosProducto($request->validated());
+        return response()->json(Producto::create($data), 201);
     }
 
     public function show(Producto $producto)
@@ -36,7 +56,8 @@ class ProductoController extends Controller
 
     public function update(ProductoRequest $request, Producto $producto)
     {
-        $producto->update($request->validated());
+        $data = $this->procesarDatosProducto($request->validated());
+        $producto->update($data);
         return response()->json($producto->load(['categoria', 'subcategoria', 'estadoProducto']));
     }
 

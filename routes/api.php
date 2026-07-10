@@ -21,6 +21,8 @@ use App\Http\Controllers\SubcategoriaController;
 use App\Http\Controllers\TipoMovimientoInventarioController;
 use App\Http\Controllers\VentaController;
 use App\Http\Controllers\VentaDetalleController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoleController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -47,6 +49,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('venta-detalles', VentaDetalleController::class)->only(['index', 'show', 'destroy']);
     Route::apiResource('compras', CompraController::class)->except(['update']);
     Route::apiResource('compra-detalles', CompraDetalleController::class)->only(['index', 'show', 'destroy']);
+    Route::apiResource('usuarios', UserController::class)->parameters(['usuarios' => 'usuario']);
+    Route::get('roles', [RoleController::class, 'index']);
 
     Route::prefix('reportes')->group(function () {
         Route::get('dashboard-stats', [ReporteController::class, 'dashboardStats']);
